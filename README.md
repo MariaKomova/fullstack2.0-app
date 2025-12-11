@@ -100,3 +100,6 @@ curl -X DELETE http://localhost/items/1
 - Loki: http://localhost:3100
 
 Метрики приложения: http://localhost:8000/metrics
+
+Для развёртывания стека мониторинга (Grafana+Loki+Prometheus) используйте [observability-stack](https://github.com/MariaKomova/observability-stack).
+
