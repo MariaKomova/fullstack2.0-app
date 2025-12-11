@@ -1,0 +1,47 @@
+name: Deploy FullStack App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, debian-ci-final]
+
+    steps:
+    - name: Fix Permissions
+      run: |
+        sudo chown -R $(whoami):$(whoami) "${{ github.workspace }}" || true
+        sudo chmod -R 755 "${{ github.workspace }}" || true
+
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Environment
+      run: |
+        echo "POSTGRES_PASSWORD=MySecretPass2025" > .env
+        echo "POSTGRES_USER=app_user" >> .env
+        echo "POSTGRES_DB=fullstack_project_db" >> .env
+        echo "DATABASE_HOST=db" >> .env
+        echo "DATABASE_NAME=fullstack_project_db" >> .env
+        echo "DATABASE_USER=app_user" >> .env
+        echo "DATABASE_PASSWORD=MySecretPass2025" >> .env
+        echo "DATABASE_URL=postgresql://app_user:MySecretPass2025@db:5432/fullstack_project_db" >> .env
+        echo "SQLALCHEMY_DATABASE_URI=postgresql://app_user:MySecretPass2025@db:5432/fullstack_project_db" >> .env
+
+    - name: Stop Old Containers
+      run: sudo docker-compose -f docker-compose.app.yml down || true
+
+    - name: Build and Run
+      run: sudo docker-compose -f docker-compose.app.yml up -d --build
+
+    - name: Initialize Database
+      run: |
+        sleep 15
+        sudo docker-compose -f docker-compose.app.yml exec -T backend python init_db.py
+        sudo docker-compose -f docker-compose.app.yml exec -T backend flask db upgrade || echo "Migrations skipped"
+
+    - name: Check Status
+      run: sudo docker-compose -f docker-compose.app.yml ps
