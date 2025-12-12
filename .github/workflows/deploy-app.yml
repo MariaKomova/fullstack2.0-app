@@ -33,6 +33,11 @@ jobs:
 
     - name: Stop Old Containers
       run: sudo docker-compose -f docker-compose.app.yml down || true
+    
+    - name: Clean up old containers
+      run: |
+        sudo docker rm -f maria_db_1 maria_frontend_1 fullstack20-app_backend_1 fullstack20-clean_backend_1 2>/dev/null || true
+        sudo docker network prune -f 2>/dev/null || true
 
     - name: Build and Run
       run: sudo docker-compose -f docker-compose.app.yml up -d --build
