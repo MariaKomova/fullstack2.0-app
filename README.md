@@ -96,7 +96,7 @@ curl -X DELETE http://localhost/items/1
 ## 📊 Мониторинг
 
 Для мониторинга используйте отдельный стек observability:
-- Grafana: http://localhost:3000 (admin/admin123)
+- Grafana: http://localhost:3000 (admin/admin)
 - Prometheus: http://localhost:9090
 - Loki: http://localhost:3100
 
